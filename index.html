@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>电力交易员背题小程序</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:#f5f7fa;color:#333;line-height:1.6;overscroll-behavior-y:none}
+.container{max-width:720px;margin:0 auto;padding:16px;min-height:100vh}
+.home-header{text-align:center;padding:32px 0 24px}
+.home-header h1{font-size:26px;color:#1a73e8;margin-bottom:8px}
+.home-header p{color:#666;font-size:14px}
+.card{background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+.card-title{font-size:16px;font-weight:600;margin-bottom:14px;color:#222;display:flex;align-items:center;gap:8px}
+.tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:12px;font-weight:500}
+.tag-blue{background:#e8f0fe;color:#1967d2}
+.tag-green{background:#e6f4ea;color:#188038}
+.tag-orange{background:#fce8e6;color:#c5221f}
+.tag-purple{background:#f3e8fd;color:#9334e6}
+.btn{display:block;width:100%;padding:14px;border-radius:12px;border:none;font-size:16px;font-weight:600;cursor:pointer;margin-top:12px;transition:all .2s;text-align:center}
+.btn-primary{background:#1a73e8;color:#fff}
+.btn-primary:active{background:#1557b0;transform:scale(0.98)}
+.btn-success{background:#188038;color:#fff}
+.btn-success:active{background:#137333;transform:scale(0.98)}
+.btn-warning{background:#f9ab00;color:#fff}
+.btn-danger{background:#ea4335;color:#fff}
+.btn-secondary{background:#e8eaed;color:#3c4043}
+.btn-secondary:active{background:#dadce0}
+.btn-outline{background:#fff;color:#1a73e8;border:1.5px solid #1a73e8}
+.set-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+.set-btn{padding:12px;border-radius:10px;border:1.5px solid #dadce0;background:#fff;text-align:center;cursor:pointer;font-size:14px;font-weight:500}
+.set-btn.active{border-color:#1a73e8;background:#e8f0fe;color:#1967d2}
+.mode-row{display:flex;gap:10px;margin-top:10px}
+.mode-row .btn{flex:1;margin-top:0;font-size:14px;padding:12px 4px}
+.stats-row{display:flex;justify-content:space-around;text-align:center;margin-top:10px}
+.stats-item .num{font-size:24px;font-weight:700;color:#1a73e8}
+.stats-item .label{font-size:12px;color:#666;margin-top:2px}
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 0;position:sticky;top:0;background:#f5f7fa;z-index:10}
+.back-btn{font-size:14px;color:#1a73e8;cursor:pointer;padding:6px}
+.progress{font-size:14px;color:#666;font-weight:500}
+.question-card{background:#fff;border-radius:16px;padding:20px;margin-bottom:16px}
+.q-meta{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.q-text{font-size:17px;line-height:1.7;color:#222;font-weight:500;margin-bottom:16px;word-break:break-word}
+.options{display:flex;flex-direction:column;gap:10px}
+.opt{padding:14px 16px;border-radius:12px;border:1.5px solid #dadce0;background:#fff;cursor:pointer;font-size:15px;display:flex;align-items:flex-start;gap:10px;transition:all .15s}
+.opt:active{transform:scale(0.99)}
+.opt-index{min-width:28px;height:28px;border-radius:50%;background:#f1f3f4;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#5f6368;flex-shrink:0}
+.opt-text{flex:1;padding-top:2px;line-height:1.5}
+.opt.correct{border-color:#188038;background:#e6f4ea}
+.opt.correct .opt-index{background:#188038;color:#fff}
+.opt.wrong{border-color:#ea4335;background:#fce8e6}
+.opt.wrong .opt-index{background:#ea4335;color:#fff}
+.opt.disabled{opacity:.7;pointer-events:none}
+.answer-bar{margin-top:16px;padding:14px;border-radius:12px;background:#e8f0fe;display:none;align-items:center;justify-content:space-between;gap:10px}
+.answer-bar.show{display:flex;flex-wrap:wrap}
+.answer-text{font-size:15px;color:#1967d2;font-weight:600}
+.action-bar{display:flex;gap:10px;margin-top:16px;position:sticky;bottom:16px}
+.action-bar .btn{margin-top:0;flex:1}
+.empty-state{text-align:center;padding:60px 20px;color:#666}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+.hidden{display:none!important}
+.wb-item{padding:14px;border-bottom:1px solid #eee;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.wb-item:last-child{border-bottom:none}
+.wb-q{flex:1;font-size:14px;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:10px}
+.wb-tag{font-size:12px;padding:2px 8px;border-radius:6px;background:#fce8e6;color:#c5221f;flex-shrink:0;margin-right:8px}
+.wb-del{color:#ea4335;font-size:13px;padding:4px 8px;cursor:pointer;flex-shrink:0}
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.75);color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;pointer-events:none;opacity:0;transition:opacity .3s;z-index:100}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="container">
+<div id="page-home">
+<div class="home-header"><h1>📚 电力交易员背题</h1><p>三级题库 · 共 <span id="total-count">0</span> 题</p></div>
+<div class="card"><div class="card-title">🎯 选择题库</div><div class="set-grid" id="set-list"><div class="set-btn active" data-set="all">全部套题</div></div></div>
+<div class="card"><div class="card-title">⚙️ 背题模式</div><div class="mode-row"><button class="btn btn-secondary active" id="mode-order" onclick="setMode('order')">📋 顺序背题</button><button class="btn btn-secondary" id="mode-shuffle" onclick="setMode('shuffle')">🔀 乱序背题</button></div><div id="continue-box" class="hidden" style="margin-top:12px"><button class="btn btn-outline" onclick="continueLast()">▶️ 继续上次进度</button></div></div>
+<div class="card"><div class="card-title">📊 数据统计</div><div class="stats-row"><div class="stats-item"><div class="num" id="stat-wb">0</div><div class="label">错题本</div></div><div class="stats-item"><div class="num" id="stat-done">0</div><div class="label">已做题</div></div><div class="stats-item"><div class="num" id="stat-progress">0%</div><div class="label">总进度</div></div></div></div>
+<button class="btn btn-primary" onclick="startStudy()">🚀 开始背题</button>
+<button class="btn btn-danger" style="margin-top:10px" onclick="showWrongBook()">❌ 错题本</button>
+</div>
+<div id="page-quiz" class="hidden">
+<div class="top-bar"><div class="back-btn" onclick="exitAndSave()">← 退出存档</div><div class="progress"><span id="q-current">1</span> / <span id="q-total">100</span></div><div style="width:50px"></div></div>
+<div class="question-card"><div class="q-meta"><span class="tag tag-blue" id="q-set">第1套</span><span class="tag tag-green" id="q-type">单选题</span></div><div class="q-text" id="q-text">题目加载中...</div><div class="options" id="q-options"></div><div class="answer-bar" id="answer-bar"><div class="answer-text">✅ 正确答案：<span id="q-answer"></span></div><button class="btn btn-warning" style="margin:0;padding:8px 14px;font-size:13px;width:auto" onclick="toggleWrong()">❌ 加入错题本</button></div></div>
+<div class="action-bar"><button class="btn btn-secondary" onclick="prevQuestion()">上一题</button><button class="btn btn-primary" onclick="nextQuestion()">下一题 →</button></div>
+</div>
+<div id="page-wb" class="hidden">
+<div class="top-bar"><div class="back-btn" onclick="showHome()">← 返回首页</div><div style="font-weight:600">错题本</div><div style="width:50px"></div></div>
+<div class="card" id="wb-list-box"><div class="card-title">❌ 我的错题 (<span id="wb-count">0</span>)</div><div id="wb-list"></div><button class="btn btn-primary" style="margin-top:16px" onclick="startWrongBook()">🔄 开始背错题</button><button class="btn btn-secondary" style="margin-top:8px" onclick="clearWrongBook()">🗑️ 清空错题本</button></div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="data.js"></script>
+<script>
+const STORE_KEY="power_trader_quiz_v1";
+let state={mode:"order",selectedSet:"all",currentIndex:0,questions:[],wrongBook:[],answered:{},shuffleSeed:null,showAnswer:false};
+function init(){loadState();renderSets();updateStats();document.getElementById("total-count").textContent=QUESTIONS.length;if(localStorage.getItem(STORE_KEY))document.getElementById("continue-box").classList.remove("hidden")}
+function renderSets(){let sets=[...new Set(QUESTIONS.map(q=>q.s))].sort();let c=document.getElementById("set-list");sets.forEach(s=>{let d=document.createElement("div");d.className="set-btn";d.textContent=s;d.dataset.set=s;d.onclick=()=>selectSet(s);c.appendChild(d)})}
+function selectSet(s){state.selectedSet=s;document.querySelectorAll(".set-btn").forEach(e=>e.classList.remove("active"));document.querySelector(`.set-btn[data-set="${s}"]`).classList.add("active")}
+function setMode(m){state.mode=m;document.getElementById("mode-order").classList.toggle("active",m==="order");document.getElementById("mode-shuffle").classList.toggle("active",m==="shuffle")}
+function getFilteredQuestions(){return state.selectedSet==="all"?[...QUESTIONS]:QUESTIONS.filter(q=>q.s===state.selectedSet)}
+function shuffleArray(arr,seed){let rng=mulberry32(seed);let a=[...arr];for(let i=a.length-1;i>0;i--){let j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function mulberry32(a){return function(){var t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+function startStudy(){let qs=getFilteredQuestions();if(qs.length===0){toast("该题库暂无题目");return}state.mode=document.getElementById("mode-order").classList.contains("active")?"order":"shuffle";if(state.mode==="shuffle"){let saved=loadRawState();if(saved&&saved.shuffleSeed&&saved.selectedSet===state.selectedSet)state.shuffleSeed=saved.shuffleSeed;else state.shuffleSeed=Date.now();qs=shuffleArray(qs,state.shuffleSeed)}state.questions=qs;state.currentIndex=0;state.showAnswer=false;saveState();showPage("page-quiz");renderQuestion()}
+function continueLast(){let saved=loadRawState();if(!saved){toast("没有存档");return}Object.assign(state,saved);let idMap=new Map(QUESTIONS.map(q=>[q.i,q]));state.questions=state.questions.map(q=>typeof q==="string"?idMap.get(q):q).filter(Boolean);showPage("page-quiz");renderQuestion()}
+function renderQuestion(){let q=state.questions[state.currentIndex];document.getElementById("q-current").textContent=state.currentIndex+1;document.getElementById("q-total").textContent=state.questions.length;document.getElementById("q-set").textContent=q.s;let typeMap={single:"单选题",multi:"多选题",judge:"判断题"};document.getElementById("q-type").textContent=typeMap[q.t]||"题";document.getElementById("q-text").textContent=q.n+". "+q.q;let optsDiv=document.getElementById("q-options");optsDiv.innerHTML="";let labels=["A","B","C","D","E","F"];q.o.forEach((opt,idx)=>{let div=document.createElement("div");div.className="opt";div.innerHTML=`<div class="opt-index">${labels[idx]}</div><div class="opt-text">${opt}</div>`;div.onclick=()=>selectOption(idx,labels[idx]);optsDiv.appendChild(div)});state.showAnswer=false;document.getElementById("answer-bar").classList.remove("show");document.getElementById("q-answer").textContent=q.a;updateWrongBtn()}
+function selectOption(idx,label){if(state.showAnswer)return;state.showAnswer=true;let q=state.questions[state.currentIndex];let opts=document.querySelectorAll(".opt");opts.forEach((el,i)=>{let li=["A","B","C","D","E","F"][i];if(q.t==="judge"){let isCorrect=(li==="A"&&q.a==="正确")||(li==="B"&&q.a==="错误");if(isCorrect)el.classList.add("correct");else if(i===idx)el.classList.add("wrong");else el.classList.add("disabled")}else{let ansSet=new Set(q.a.split(""));if(ansSet.has(li))el.classList.add("correct");else if(i===idx)el.classList.add("wrong");else el.classList.add("disabled")}});state.answered[q.i]=true;document.getElementById("answer-bar").classList.add("show");saveState()}
+function nextQuestion(){if(state.currentIndex<state.questions.length-1){state.currentIndex++;renderQuestion();saveState()}else toast("已经是最后一题了")}
+function prevQuestion(){if(state.currentIndex>0){state.currentIndex--;renderQuestion();saveState()}}
+function exitAndSave(){saveState();showPage("page-home");updateStats()}
+function toggleWrong(){let q=state.questions[state.currentIndex];let idx=state.wrongBook.indexOf(q.i);if(idx===-1){state.wrongBook.push(q.i);toast("已加入错题本")}else{state.wrongBook.splice(idx,1);toast("已从错题本移除")}updateWrongBtn();saveState()}
+function updateWrongBtn(){let q=state.questions[state.currentIndex];let inWb=state.wrongBook.includes(q.i);let btn=document.querySelector("#answer-bar button");btn.textContent=inWb?"✅ 移出错题本":"❌ 加入错题本";btn.className=inWb?"btn btn-success":"btn btn-warning";btn.style.cssText="margin:0;padding:8px 14px;font-size:13px;width:auto"}
+function showWrongBook(){renderWrongBookList();showPage("page-wb")}
+function renderWrongBookList(){let list=document.getElementById("wb-list");list.innerHTML="";let idMap=new Map(QUESTIONS.map(q=>[q.i,q]));let wqs=state.wrongBook.map(id=>idMap.get(id)).filter(Boolean);document.getElementById("wb-count").textContent=wqs.length;if(wqs.length===0){list.innerHTML='<div class="empty-state"><div class="icon">🎉</div><div>错题本空空如也，继续保持！</div></div>';return}wqs.forEach(q=>{let div=document.createElement("div");div.className="wb-item";div.innerHTML=`<div class="wb-q">${q.n}. ${q.q}</div><div style="display:flex;align-items:center"><span class="wb-tag">${q.s}</span><span class="wb-del" onclick="event.stopPropagation();removeWrong('${q.i}')">删除</span></div>`;div.onclick=()=>startWrongBookFrom(q.i);list.appendChild(div)})}
+function removeWrong(id){let idx=state.wrongBook.indexOf(id);if(idx>-1)state.wrongBook.splice(idx,1);renderWrongBookList();saveState()}
+function clearWrongBook(){if(!confirm("确定清空所有错题吗？"))return;state.wrongBook=[];renderWrongBookList();saveState()}
+function startWrongBook(){let idMap=new Map(QUESTIONS.map(q=>[q.i,q]));let wqs=state.wrongBook.map(id=>idMap.get(id)).filter(Boolean);if(wqs.length===0){toast("错题本为空");return}state.mode="wrong";state.questions=wqs;state.currentIndex=0;state.showAnswer=false;saveState();showPage("page-quiz");renderQuestion()}
+function startWrongBookFrom(id){let idMap=new Map(QUESTIONS.map(q=>[q.i,q]));let wqs=state.wrongBook.map(i=>idMap.get(i)).filter(Boolean);let idx=wqs.findIndex(q=>q.i===id);state.mode="wrong";state.questions=wqs;state.currentIndex=idx>=0?idx:0;state.showAnswer=false;saveState();showPage("page-quiz");renderQuestion()}
+function saveState(){let payload={mode:state.mode,selectedSet:state.selectedSet,currentIndex:state.currentIndex,questions:state.questions.map(q=>q.i),wrongBook:state.wrongBook,answered:state.answered,shuffleSeed:state.shuffleSeed,savedAt:Date.now()};localStorage.setItem(STORE_KEY,JSON.stringify(payload))}
+function loadRawState(){try{let raw=localStorage.getItem(STORE_KEY);return raw?JSON.parse(raw):null}catch(e){return null}}
+function loadState(){let saved=loadRawState();if(saved){state.mode=saved.mode||"order";state.selectedSet=saved.selectedSet||"all";state.currentIndex=saved.currentIndex||0;state.wrongBook=saved.wrongBook||[];state.answered=saved.answered||{};state.shuffleSeed=saved.shuffleSeed||null}}
+function updateStats(){let total=QUESTIONS.length;let done=Object.keys(state.answered).length;document.getElementById("stat-wb").textContent=state.wrongBook.length;document.getElementById("stat-done").textContent=done;document.getElementById("stat-progress").textContent=total?Math.round(done/total*100)+"%":"0%"}
+function showPage(id){["page-home","page-quiz","page-wb"].forEach(p=>document.getElementById(p).classList.toggle("hidden",p!==id))}
+function toast(msg){let t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800)}
+window.addEventListener("DOMContentLoaded",init);
+</script>
+</body>
+</html>
